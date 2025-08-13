@@ -32,9 +32,9 @@ func pluralize(word string) string {
 	return word + "s"
 }
 
-func main() {
+func generateRouters() {
 	// List of router names
-	routerNames := []string{"plan"} // "role" ,"amphur", "entrepreneur", "faculty", "incharge", "job", "mooban", "province", "semester", "tambon"
+	routerNames := []string{"plan"} // Add more router names as needed, e.g., "role", "amphur", "entrepreneur", "faculty", "incharge", "job", "mooban", "province", "semester", "tambon"
 
 	// Loop through each name and generate the router file
 	for _, router := range routerNames {
