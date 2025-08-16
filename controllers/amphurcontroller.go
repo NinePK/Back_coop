@@ -12,8 +12,19 @@ import (
 func GetAmphurs(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 	var amphurs []models.Amphur
-	if result := db.Find(&amphurs); result.Error != nil {
-		return c.Status(500).JSON(fiber.Map{"error": result.Error.Error()})
+	
+	// ตรวจสอบ query parameter province_id
+	provinceId := c.Query("province_id")
+	if provinceId != "" {
+		// ถ้ามี province_id ให้ filter ตาม province_id
+		if result := db.Order("value").Find(&amphurs, "province_id = ?", provinceId); result.Error != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Amphur not found"})
+		}
+	} else {
+		// ถ้าไม่มี province_id ให้ดึงทั้งหมด
+		if result := db.Find(&amphurs); result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": result.Error.Error()})
+		}
 	}
 	return c.JSON(amphurs)
 }

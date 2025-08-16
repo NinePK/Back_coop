@@ -340,3 +340,127 @@ type Weekly struct {
 	UpdatedAt  sql.NullTime   `gorm:"column:updated_at;type:datetime;default:null" json:"updated_at"`
 	Training   Training       `gorm:"foreignKey:TrainingID" json:"training"`
 }
+
+// ReportOutline [Coop07] - แบบฟอร์มแจ้งโครงร่างรายงาน
+type ReportOutline struct {
+	ID         int64     `gorm:"autoIncrement:true;primaryKey;column:id;type:int(11);not null" json:"id"`
+	TrainingID int64     `gorm:"index:fk_report_outline_training_idx;column:training_id;type:int(11);not null" json:"trainingId"`
+	Chapters   string    `gorm:"column:chapters;type:mediumtext;not null" json:"chapters"` // JSON string of chapters
+	CreatedAt  sql.NullTime `gorm:"column:created_at;type:datetime;default:now()" json:"createdAt"`
+	UpdatedAt  sql.NullTime `gorm:"column:updated_at;type:datetime;default:null" json:"updatedAt"`
+	Training   Training  `gorm:"foreignKey:TrainingID" json:"training"`
+}
+
+func (ReportOutline) TableName() string {
+	return "report_outline"
+}
+
+// ReportSubmission [Coop10] - แบบฟอร์มยืนยันส่งรายงาน
+type ReportSubmission struct {
+	ID                  int64     `gorm:"autoIncrement:true;primaryKey;column:id;type:int(11);not null" json:"id"`
+	TrainingID          int64     `gorm:"index:fk_report_submission_training_idx;column:training_id;type:int(11);not null" json:"trainingId"`
+	ReportTitleThai     string    `gorm:"column:report_title_thai;type:varchar(500);not null" json:"reportTitleThai"`
+	ReportTitleEnglish  string    `gorm:"column:report_title_english;type:varchar(500);not null" json:"reportTitleEnglish"`
+	SubmissionDate      string    `gorm:"column:submission_date;type:varchar(10);not null" json:"submissionDate"`
+	StudentSignatureDate string   `gorm:"column:student_signature_date;type:varchar(20);not null" json:"studentSignatureDate"`
+	AdvisorApprovalStatus string  `gorm:"column:advisor_approval_status;type:varchar(20);default:pending" json:"advisorApprovalStatus"`
+	AdvisorApprovalDate string    `gorm:"column:advisor_approval_date;type:varchar(20);default:null" json:"advisorApprovalDate"`
+	CreatedAt           sql.NullTime `gorm:"column:created_at;type:datetime;default:now()" json:"createdAt"`
+	UpdatedAt           sql.NullTime `gorm:"column:updated_at;type:datetime;default:null" json:"updatedAt"`
+	Training            Training  `gorm:"foreignKey:TrainingID" json:"training"`
+}
+
+func (ReportSubmission) TableName() string {
+	return "report_submission"
+}
+
+// JobDetails [Coop11] - แบบฟอร์มรายละเอียดการปฏิบัติงาน
+type JobDetails struct {
+	ID                 int64     `gorm:"autoIncrement:true;primaryKey;column:id;type:int(11);not null" json:"id"`
+	TrainingID         int64     `gorm:"index:fk_job_details_training_idx;column:training_id;type:int(11);not null" json:"trainingId"`
+	JobPosition        string    `gorm:"column:job_position;type:varchar(200);not null" json:"jobPosition"`
+	JobDescription     string    `gorm:"column:job_description;type:mediumtext;not null" json:"jobDescription"`
+	ReportTitleThai    string    `gorm:"column:report_title_thai;type:varchar(500);not null" json:"reportTitleThai"`
+	ReportTitleEnglish string    `gorm:"column:report_title_english;type:varchar(500);not null" json:"reportTitleEnglish"`
+	Status             string    `gorm:"column:status;type:varchar(20);default:submitted" json:"status"`
+	CreatedAt          sql.NullTime `gorm:"column:created_at;type:datetime;default:now()" json:"createdAt"`
+	UpdatedAt          sql.NullTime `gorm:"column:updated_at;type:datetime;default:null" json:"updatedAt"`
+	Training           Training  `gorm:"foreignKey:TrainingID" json:"training"`
+}
+
+func (JobDetails) TableName() string {
+	return "job_details"
+}
+
+// SelfEvaluation [Coop12] - แบบฟอร์มประเมินตนเอง
+type SelfEvaluation struct {
+	ID                  int64     `gorm:"autoIncrement:true;primaryKey;column:id;type:int(11);not null" json:"id"`
+	TrainingID          int64     `gorm:"index:fk_self_evaluation_training_idx;column:training_id;type:int(11);not null" json:"trainingId"`
+	Evaluations         string    `gorm:"column:evaluations;type:mediumtext;not null" json:"evaluations"` // JSON string of evaluations
+	AdditionalComments  string    `gorm:"column:additional_comments;type:mediumtext;default:null" json:"additionalComments"`
+	TotalScore          int64     `gorm:"column:total_score;type:int(11);not null" json:"totalScore"`
+	MaxScore            int64     `gorm:"column:max_score;type:int(11);not null" json:"maxScore"`
+	AverageScore        float64   `gorm:"column:average_score;type:double;not null" json:"averageScore"`
+	CompletedItems      int64     `gorm:"column:completed_items;type:int(11);not null" json:"completedItems"`
+	CreatedAt           sql.NullTime `gorm:"column:created_at;type:datetime;default:now()" json:"createdAt"`
+	UpdatedAt           sql.NullTime `gorm:"column:updated_at;type:datetime;default:null" json:"updatedAt"`
+	Training            Training  `gorm:"foreignKey:TrainingID" json:"training"`
+}
+
+func (SelfEvaluation) TableName() string {
+	return "self_evaluation"
+}
+
+// Notification - ระบบแจ้งเตือน
+type Notification struct {
+	ID          int64     `gorm:"autoIncrement:true;primaryKey;column:id;type:int(11);not null" json:"id"`
+	RecipientID int64     `gorm:"index:fk_notification_recipient_idx;column:recipient_id;type:int(11);not null" json:"recipientId"`
+	SenderID    int64     `gorm:"index:fk_notification_sender_idx;column:sender_id;type:int(11);not null" json:"senderId"`
+	Type        string    `gorm:"column:type;type:varchar(50);not null" json:"type"` // document_submitted, advisor_assigned, etc.
+	Title       string    `gorm:"column:title;type:varchar(200);not null" json:"title"`
+	Message     string    `gorm:"column:message;type:mediumtext;not null" json:"message"`
+	DocumentType string   `gorm:"column:document_type;type:varchar(20);default:null" json:"documentType"` // coop07, coop10, etc.
+	RelatedID   int64     `gorm:"column:related_id;type:int(11);default:null" json:"relatedId"` // ID ของเอกสารที่เกี่ยวข้อง
+	IsRead      bool      `gorm:"column:is_read;type:tinyint(1);default:0" json:"isRead"`
+	Priority    string    `gorm:"column:priority;type:varchar(20);default:normal" json:"priority"` // high, normal, low
+	CreatedAt   sql.NullTime `gorm:"column:created_at;type:datetime;default:now()" json:"createdAt"`
+	UpdatedAt   sql.NullTime `gorm:"column:updated_at;type:datetime;default:null" json:"updatedAt"`
+	Recipient   User      `gorm:"foreignKey:RecipientID" json:"recipient"`
+	Sender      User      `gorm:"foreignKey:SenderID" json:"sender"`
+}
+
+func (Notification) TableName() string {
+	return "notification"
+}
+
+// Coop04Accommodation - ข้อมูลที่พักสำหรับ COOP-04
+type Coop04Accommodation struct {
+	ID                  int64     `gorm:"autoIncrement:true;primaryKey;column:id;type:int(11);not null" json:"id"`
+	TrainingID          int64     `gorm:"index:fk_accommodation_training_idx;column:training_id;type:int(11);not null" json:"trainingId"`
+	UserID              int64     `gorm:"index:fk_accommodation_user_idx;column:user_id;type:int(11);not null" json:"userId"`
+	AccommodationType   string    `gorm:"column:accommodation_type;type:varchar(50);not null" json:"accommodationType"`
+	AccommodationName   string    `gorm:"column:accommodation_name;type:varchar(200);default:null" json:"accommodationName"`
+	RoomNumber          string    `gorm:"column:room_number;type:varchar(20);default:null" json:"roomNumber"`
+	Address             string    `gorm:"column:address;type:varchar(500);not null" json:"address"`
+	Subdistrict         string    `gorm:"column:subdistrict;type:varchar(100);not null" json:"subdistrict"`
+	District            string    `gorm:"column:district;type:varchar(100);not null" json:"district"`
+	Province            string    `gorm:"column:province;type:varchar(100);not null" json:"province"`
+	PostalCode          string    `gorm:"column:postal_code;type:varchar(10);not null" json:"postalCode"`
+	PhoneNumber         string    `gorm:"column:phone_number;type:varchar(20);default:null" json:"phoneNumber"`
+	EmergencyContact    string    `gorm:"column:emergency_contact;type:varchar(200);not null" json:"emergencyContact"`
+	EmergencyPhone      string    `gorm:"column:emergency_phone;type:varchar(20);not null" json:"emergencyPhone"`
+	EmergencyRelation   string    `gorm:"column:emergency_relation;type:varchar(100);not null" json:"emergencyRelation"`
+	TravelMethod        string    `gorm:"column:travel_method;type:varchar(100);not null" json:"travelMethod"`
+	TravelDetails       string    `gorm:"column:travel_details;type:text;default:null" json:"travelDetails"`
+	DistanceKm          float64   `gorm:"column:distance_km;type:decimal(5,2);default:null" json:"distanceKm"`
+	TravelTime          int64     `gorm:"column:travel_time;type:int(11);default:null" json:"travelTime"`
+	Status              string    `gorm:"column:status;type:enum('pending','submitted','approved','rejected');default:submitted" json:"status"`
+	CreatedAt           sql.NullTime `gorm:"column:created_at;type:datetime;default:now()" json:"createdAt"`
+	UpdatedAt           sql.NullTime `gorm:"column:updated_at;type:datetime;default:null" json:"updatedAt"`
+	Training            Training  `gorm:"foreignKey:TrainingID" json:"training"`
+	User                User      `gorm:"foreignKey:UserID" json:"user"`
+}
+
+func (Coop04Accommodation) TableName() string {
+	return "coop04_accommodation"
+}

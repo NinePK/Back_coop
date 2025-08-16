@@ -36,6 +36,12 @@ func initDatabase(user string, pass string, dbname string) (*gorm.DB, error) {
 	db.AutoMigrate(&models.Entrepreneur{}, &models.Mooban{})
 	db.AutoMigrate(&models.Plan{})
 	db.AutoMigrate(&models.Weekly{})
+	db.AutoMigrate(&models.ReportOutline{})
+	db.AutoMigrate(&models.ReportSubmission{})
+	db.AutoMigrate(&models.JobDetails{})
+	db.AutoMigrate(&models.SelfEvaluation{})
+	db.AutoMigrate(&models.Notification{})
+	db.AutoMigrate(&models.Coop04Accommodation{})
 
 	// db.AutoMigrate(&models.User{}, &models.Role{})
 
@@ -61,7 +67,8 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		// AllowOriginsFunc: func(ctx *fiber.Ctx) bool {
-		// 	return ctx.Origin() == "http://localhost:6007" || ctx.Origin() == "https://coop.ict.up.ac.th"
+		// 	return ctx.Origin() == "http://localhost:6007" ||
+		//  ctx.Origin() == "https://coop.ict.up.ac.th"
 		// },
 		AllowOrigins:     "https://coop.ict.up.ac.th, http://localhost:6007,http://localhost:3000,http://localhost:3001",
 		AllowHeaders:     "Origin, Content-Type, Accept", // Update with necessary headers
@@ -106,6 +113,14 @@ func main() {
 	routers.PlanRoutes(app)
 	routers.WeeklyRoutes(app)
 	routers.TeacherRoutes(app)
+	routers.ReportOutlineRoutes(app)
+	routers.ReportSubmissionRoutes(app)
+	routers.JobDetailsRoutes(app)
+	routers.SelfEvaluationRoutes(app)
+	routers.Coop04AccommodationRoutes(app)
+	
+	// Register notification routes
+	routers.RegisterNotificationRoutes(app)
 	// Define routes
 	// app.Get("/faculty", getFaculty)          // SELECT all users
 

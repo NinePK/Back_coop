@@ -10,7 +10,7 @@ func TeacherRoutes(app *fiber.App) {
 	teacher_route := app.Group("/teacher")
 
 	// Get students supervised by teacher
-	teacher_route.Get("/:teacher_id/students", controllers.GetTeacherStudents)
+	teacher_route.Get("/students/:teacher_id", controllers.GetTeacherStudents)
 	
 	// Get teacher dashboard statistics
 	teacher_route.Get("/:teacher_id/stats", controllers.GetTeacherStats)

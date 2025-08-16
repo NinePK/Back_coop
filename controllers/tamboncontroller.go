@@ -12,8 +12,19 @@ import (
 func GetTambons(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 	var tambons []models.Tambon
-	if result := db.Find(&tambons); result.Error != nil {
-		return c.Status(500).JSON(fiber.Map{"error": result.Error.Error()})
+	
+	// ตรวจสอบ query parameter amphur_id
+	amphurId := c.Query("amphur_id")
+	if amphurId != "" {
+		// ถ้ามี amphur_id ให้ filter ตาม amphur_id
+		if result := db.Order("value").Find(&tambons, "amphur_id = ?", amphurId); result.Error != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Tambon not found"})
+		}
+	} else {
+		// ถ้าไม่มี amphur_id ให้ดึงทั้งหมด
+		if result := db.Find(&tambons); result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": result.Error.Error()})
+		}
 	}
 	return c.JSON(tambons)
 }
